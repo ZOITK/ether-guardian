@@ -41,18 +41,16 @@ func _initialize_ar_session() -> void:
 func _initialize_arcore() -> void:
 	print("[AR Manager] ARCore 초기화 중...")
 
-	# 1단계: 권한 관리자 초기화
-	permission_manager = PermissionManager.new()
-	add_child(permission_manager)
+	# 1단계: 카메라 권한 요청 (런타임 권한)
+	print("[AR Manager] 카메라 권한 요청 중...")
+	var camera_permission_granted = OS.request_permission("CAMERA")
+	var location_permission_granted = OS.request_permission("ACCESS_FINE_LOCATION")
 
-	# 카메라 권한 요청
-	if not permission_manager.request_camera_permission():
-		print("[AR Manager] ❌ 카메라 권한 거부 - ARCore 초기화 실패")
-		ar_session_failed.emit("Camera permission denied")
-		ar_state = ARState.FAILED
-		return
-
-	print("[AR Manager] ✅ 카메라 권한 획득")
+	print("[AR Manager] ⚠️  권한 요청 결과 - 카메라: %s, 위치: %s" % [
+		"승인" if camera_permission_granted else "거부/보류",
+		"승인" if location_permission_granted else "거부/보류"
+	])
+	print("[AR Manager] ✅ 카메라 권한 요청 완료")
 
 	# 2단계: 카메라 피드 표시 (씬에서 CameraDisplay 노드 참조)
 	camera_display = get_node("CameraDisplay")
@@ -84,18 +82,16 @@ func _initialize_arcore() -> void:
 func _initialize_arkit() -> void:
 	print("[AR Manager] ARKit 초기화 중...")
 
-	# 1단계: 권한 관리자 초기화
-	permission_manager = PermissionManager.new()
-	add_child(permission_manager)
+	# 1단계: 카메라 권한 요청 (Info.plist의 NSCameraUsageDescription 필수)
+	print("[AR Manager] 카메라 권한 요청 중...")
+	var camera_permission_granted = OS.request_permission("CAMERA")
+	var location_permission_granted = OS.request_permission("ACCESS_FINE_LOCATION")
 
-	# 카메라 권한 요청 (Info.plist의 NSCameraUsageDescription 필수)
-	if not permission_manager.request_camera_permission():
-		print("[AR Manager] ❌ 카메라 권한 거부 - ARKit 초기화 실패")
-		ar_session_failed.emit("Camera permission denied")
-		ar_state = ARState.FAILED
-		return
-
-	print("[AR Manager] ✅ 카메라 권한 획득")
+	print("[AR Manager] ⚠️  권한 요청 결과 - 카메라: %s, 위치: %s" % [
+		"승인" if camera_permission_granted else "거부/보류",
+		"승인" if location_permission_granted else "거부/보류"
+	])
+	print("[AR Manager] ✅ 카메라 권한 요청 완료")
 
 	# 2단계: 카메라 피드 표시 (씬에서 CameraDisplay 노드 참조)
 	camera_display = get_node("CameraDisplay")

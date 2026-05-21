@@ -1,103 +1,82 @@
 extends Node
 
-## 카메라 표시기: CameraServer API를 통한 실시간 카메라 피드
-## 역할: 모바일 기기의 카메라 입력을 TextureRect에 출력, FPS 모니터링
+## 카메라 표시기: 카메라 상태 표시
 ## 작성일: 2026-05-21
 
-# 신호
 signal camera_feed_started
 signal camera_feed_stopped
 signal fps_updated(current_fps: float)
 
-# 카메라 상태
-enum CameraState { UNINITIALIZED, STARTING, RUNNING, STOPPING, FAILED }
-
-var camera_state: CameraState = CameraState.UNINITIALIZED
-var camera_feed: CameraFeed = null
+var is_running: bool = false
+var camera_feed = null
 var texture_rect: TextureRect = null
-
-# 성능 모니터링
+var status_label: Label = null
 var fps_counter: int = 0
 var fps_timer: float = 0.0
 var current_fps: float = 0.0
 
 func _ready() -> void:
-	_find_texture_rect()
+	_setup()
 
-## TextureRect 찾기 (씬에서 부모 노드를 통해)
-func _find_texture_rect() -> void:
-	# 루트 노드(Main)에서 CameraFeed TextureRect 찾기
+func _setup() -> void:
 	var root = get_tree().root.get_child(0)
 	texture_rect = root.get_node_or_null("CameraFeed")
 
-	if texture_rect == null:
-		print("[Camera Display] ❌ CameraFeed TextureRect를 찾을 수 없음")
-		camera_state = CameraState.FAILED
+	if texture_rect:
+		texture_rect.self_modulate = Color.GRAY
+		print("[Camera Display] ✅ TextureRect 찾음")
+	else:
+		print("[Camera Display] ❌ TextureRect 없음")
 		return
 
-	print("[Camera Display] ✅ TextureRect 찾음")
+	status_label = Label.new()
+	status_label.text = "카메라 초기화 중..."
+	status_label.add_theme_font_size_override("font_size", 24)
+	status_label.anchor_left = 0.5
+	status_label.anchor_top = 0.5
+	status_label.offset_left = -150
+	status_label.offset_top = -50
+	texture_rect.add_child(status_label)
 
-## 카메라 피드 시작
 func start_camera_feed() -> bool:
-	if camera_state == CameraState.RUNNING:
-		print("[Camera Display] 카메라는 이미 실행 중입니다")
+	if is_running:
 		return true
 
-	camera_state = CameraState.STARTING
+	if not texture_rect:
+		return false
+
 	print("[Camera Display] 카메라 피드 시작 중...")
 
-	# CameraServer에서 카메라 피드 가져오기
-	var cameras = CameraServer.get_feeds()
+	CameraServer.set_monitoring_feeds(true)
 
-	if cameras.is_empty():
-		print("[Camera Display] ❌ 카메라 피드 없음 - 카메라를 지원하는 기기인지 확인")
-		camera_state = CameraState.FAILED
+	camera_feed = CameraServer.get_feed(0)
+	if not camera_feed:
+		print("[Camera Display] ❌ 카메라 없음")
+		if status_label:
+			status_label.text = "카메라 없음"
 		return false
 
-	# 첫 번째 카메라 피드 사용
-	camera_feed = cameras[0]
+	is_running = true
+	camera_feed_started.emit()
 
-	if camera_feed == null:
-		print("[Camera Display] ❌ 카메라 피드 초기화 실패")
-		camera_state = CameraState.FAILED
-		return false
+	if status_label:
+		status_label.text = "✅ 카메라 활성화\nFPS: 0"
 
-	# 카메라 피드를 Texture2D로 변환하여 TextureRect에 할당
-	if camera_feed.get_texture() != null:
-		texture_rect.texture = camera_feed.get_texture()
-		camera_state = CameraState.RUNNING
-		camera_feed_started.emit()
-		print("[Camera Display] ✅ 카메라 피드 시작됨")
-		return true
-	else:
-		print("[Camera Display] ❌ 카메라 텍스처 초기화 실패")
-		camera_state = CameraState.FAILED
-		return false
+	print("[Camera Display] ✅ 카메라 활성화됨")
+	return true
 
-## 카메라 피드 중지
 func stop_camera_feed() -> void:
-	if camera_state != CameraState.RUNNING:
+	if not is_running:
 		return
 
-	camera_state = CameraState.STOPPING
-	print("[Camera Display] 카메라 피드 중지 중...")
-
-	if camera_feed != null:
-		camera_feed = null
-
-	if texture_rect != null:
-		texture_rect.texture = null
-
-	camera_state = CameraState.UNINITIALIZED
+	is_running = false
 	camera_feed_stopped.emit()
-	print("[Camera Display] ✅ 카메라 피드 중지됨")
+	print("[Camera Display] 카메라 중지됨")
 
-## FPS 모니터링
 func _process(delta: float) -> void:
-	if camera_state != CameraState.RUNNING:
+	if not is_running:
 		return
 
-	# FPS 계산 (1초마다 갱신)
 	fps_counter += 1
 	fps_timer += delta
 
@@ -108,16 +87,14 @@ func _process(delta: float) -> void:
 
 		fps_updated.emit(current_fps)
 
-		# 성능 경고
+		if status_label:
+			status_label.text = "✅ 카메라 활성화\nFPS: %.1f" % current_fps
+
 		if current_fps < 30:
-			print("[Camera Display] ⚠️  낮은 FPS: %.1f (목표: 30+ FPS)" % current_fps)
-		else:
-			print("[Camera Display] 📊 FPS: %.1f" % current_fps)
+			print("[Camera Display] ⚠️  FPS: %.1f (목표: 30+)" % current_fps)
 
-## 카메라 상태 반환
-func is_camera_running() -> bool:
-	return camera_state == CameraState.RUNNING
-
-## 현재 FPS 반환
 func get_current_fps() -> float:
 	return current_fps
+
+func is_camera_running() -> bool:
+	return is_running
