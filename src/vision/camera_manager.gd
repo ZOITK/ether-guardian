@@ -44,9 +44,27 @@ func _on_camera_feeds_updated() -> void:
 	var feeds = CameraServer.feeds()
 	print("[Camera Manager] 사용 가능한 카메라: %d개" % feeds.size())
 
+	# 모든 사용 가능한 카메라 정보 출력
+	for i in range(feeds.size()):
+		var feed = feeds[i]
+		print("[Camera Manager]   [%d] %s (ID: %d)" % [i, feed.get_name(), feed.get_id()])
+
 	if feeds.size() > 0:
-		current_feed = feeds[0]
-		print("[Camera Manager] 첫 번째 카메라 선택: %s" % current_feed.get_name())
+		# 후면 카메라(BACK) 찾기
+		var back_camera = null
+		for feed in feeds:
+			if "BACK" in feed.get_name():
+				back_camera = feed
+				break
+
+		# 후면 카메라 없으면 첫 번째 카메라 사용
+		if back_camera:
+			current_feed = back_camera
+			print("[Camera Manager] 후면 카메라 선택: %s (ID: %d)" % [current_feed.get_name(), current_feed.get_id()])
+		else:
+			current_feed = feeds[0]
+			print("[Camera Manager] 첫 번째 카메라 선택: %s (ID: %d)" % [current_feed.get_name(), current_feed.get_id()])
+
 		_start_camera()
 	else:
 		print("[Camera Manager] ❌ 카메라 없음")
@@ -65,21 +83,27 @@ func _start_camera() -> void:
 		return
 
 	print("[Camera Manager] 카메라 시작 중...")
+	print("[Camera Manager] 카메라 ID: %d" % current_feed.get_id())
 
 	# 카메라 포맷 설정
 	var formats = current_feed.get_formats()
+	print("[Camera Manager] 가능한 포맷 수: %d" % formats.size())
+
 	if formats.size() > 0:
-		print("[Camera Manager] 포맷 설정: %dx%d" % [formats[0]["width"], formats[0]["height"]])
+		var fmt = formats[0]
+		print("[Camera Manager] 포맷 설정: %dx%d (FPS: %d)" % [fmt["width"], fmt["height"], fmt.get("fps", 0)])
 		current_feed.set_format(0, {"output": "copy"})
 
 	# Y와 CBCR 텍스처 생성
 	y_texture = CameraTexture.new()
 	y_texture.camera_feed_id = current_feed.get_id()
 	y_texture.which_feed = CameraServer.FEED_Y_IMAGE
+	print("[Camera Manager] Y 텍스처 생성: feed_id=%d" % y_texture.camera_feed_id)
 
 	cbcr_texture = CameraTexture.new()
 	cbcr_texture.camera_feed_id = current_feed.get_id()
 	cbcr_texture.which_feed = CameraServer.FEED_CBCR_IMAGE
+	print("[Camera Manager] CBCR 텍스처 생성: feed_id=%d" % cbcr_texture.camera_feed_id)
 
 	# 셰이더 재료에 텍스처 전달
 	var mat = display.material as ShaderMaterial
@@ -89,13 +113,16 @@ func _start_camera() -> void:
 		print("[Camera Manager] 셰이더 매개변수 설정 완료")
 	else:
 		print("[Camera Manager] ⚠️ ShaderMaterial 없음")
+		return
 
 	# TextureRect의 메인 텍스처로 Y 텍스처 설정
 	display.texture = y_texture
+	print("[Camera Manager] TextureRect 텍스처 할당 완료")
 
 	# 카메라 활성화
 	current_feed.feed_is_active = true
 	camera_active = true
+	print("[Camera Manager] feed_is_active 설정: true")
 
 	_set_status("✅ 카메라 활성화")
 	print("[Camera Manager] ✅ 카메라 활성화 완료")
