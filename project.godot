@@ -8,26 +8,31 @@
 
 config_version=5
 
+[android]
+
+gradle_build/use_legacy_toolchain=false
+gradle_build/gradle_version="8.0"
+gradle_build/min_sdk=26
+gradle_build/target_sdk=33
+
 [application]
 
 config/name="Ether Guardian"
 config/version="0.1.0"
-config/icon="res://assets/icon.svg"
 run/main_scene="res://src/main.tscn"
-
-[debug]
-
-gdscript/warnings/unused_variable=1
-gdscript/warnings/unused_parameter=1
-gdscript/warnings/unreachable_code=1
+config/features=PackedStringArray("4.6")
+config/icon="res://assets/icon.svg"
 
 [display]
 
 window/size/viewport_width=1080
 window/size/viewport_height=1920
 window/stretch/mode="canvas_items"
-window/dpi/allow_hidpi=true
 window/handheld_mode=true
+
+[ios]
+
+general/ios_orientations=1
 
 [physics]
 
@@ -35,11 +40,10 @@ physics_engine="JoltPhysics3D"
 
 [rendering]
 
-textures/vram_compression/import_etc2_astc=true
-textures/vram_compression/import_s3tc_astc=true
 renderer/rendering_method="mobile"
-renderer/rendering_method.mobile="mobile"
+textures/vram_compression/import_etc2_astc=true
 lights_and_shadows/positional_shadow/atlas_size=2048
+textures/vram_compression/import_s3tc_astc=true
 global_illumination/gi_probes/quality=0
 environment/ambient_light/ambient_light_source=1
 
@@ -48,14 +52,3 @@ environment/ambient_light/ambient_light_source=1
 openxr/enabled=true
 openxr/default_action_map="res://xr_default_action_map.tres"
 sharpening/enabled=true
-
-[android]
-
-gradle_build/use_legacy_toolchain=false
-gradle_build/gradle_version="8.0"
-gradle_build/min_sdk=26
-gradle_build/target_sdk=33
-
-[ios]
-
-general/ios_orientations=1

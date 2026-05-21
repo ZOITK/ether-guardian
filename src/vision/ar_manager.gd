@@ -1,4 +1,4 @@
-extends Node3D
+extends Node
 
 ## AR 매니저: ARCore/ARKit 통합 관리
 ## 역할: 플랫폼별 AR 세션 초기화, 평면 감지, 상태 관리
@@ -19,7 +19,7 @@ var platform_name: String = ""
 var ar_session = null
 var plane_cache: Dictionary = {}  # ID → PlaneData
 var permission_manager: Node = null
-var camera_display: Node3D = null
+var camera_display: Node = null
 
 func _ready() -> void:
 	platform_name = OS.get_name()
@@ -54,9 +54,14 @@ func _initialize_arcore() -> void:
 
 	print("[AR Manager] ✅ 카메라 권한 획득")
 
-	# 2단계: 카메라 피드 표시
-	camera_display = CameraDisplay.new()
-	add_child(camera_display)
+	# 2단계: 카메라 피드 표시 (씬에서 CameraDisplay 노드 참조)
+	camera_display = get_node("CameraDisplay")
+
+	if camera_display == null:
+		print("[AR Manager] ❌ CameraDisplay 노드를 찾을 수 없음")
+		ar_session_failed.emit("CameraDisplay node not found")
+		ar_state = ARState.FAILED
+		return
 
 	if not camera_display.start_camera_feed():
 		print("[AR Manager] ❌ 카메라 피드 시작 실패")
@@ -92,9 +97,14 @@ func _initialize_arkit() -> void:
 
 	print("[AR Manager] ✅ 카메라 권한 획득")
 
-	# 2단계: 카메라 피드 표시
-	camera_display = CameraDisplay.new()
-	add_child(camera_display)
+	# 2단계: 카메라 피드 표시 (씬에서 CameraDisplay 노드 참조)
+	camera_display = get_node("CameraDisplay")
+
+	if camera_display == null:
+		print("[AR Manager] ❌ CameraDisplay 노드를 찾을 수 없음")
+		ar_session_failed.emit("CameraDisplay node not found")
+		ar_state = ARState.FAILED
+		return
 
 	if not camera_display.start_camera_feed():
 		print("[AR Manager] ❌ 카메라 피드 시작 실패")

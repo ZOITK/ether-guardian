@@ -1,4 +1,4 @@
-extends Node3D
+extends Node
 
 ## 카메라 표시기: CameraServer API를 통한 실시간 카메라 피드
 ## 역할: 모바일 기기의 카메라 입력을 TextureRect에 출력, FPS 모니터링
@@ -22,23 +22,20 @@ var fps_timer: float = 0.0
 var current_fps: float = 0.0
 
 func _ready() -> void:
-	_setup_camera_display()
+	_find_texture_rect()
 
-## 카메라 표시 UI 설정
-func _setup_camera_display() -> void:
-	# TextureRect 생성 (카메라 피드를 표시할 UI)
-	texture_rect = TextureRect.new()
-	texture_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	texture_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	texture_rect.anchors_preset = Control.PRESET_CENTER
-	texture_rect.size = get_viewport().get_visible_rect().size
-	texture_rect.anchor_left = 0
-	texture_rect.anchor_top = 0
-	texture_rect.anchor_right = 1
-	texture_rect.anchor_bottom = 1
+## TextureRect 찾기 (씬에서 부모 노드를 통해)
+func _find_texture_rect() -> void:
+	# 루트 노드(Main)에서 CameraFeed TextureRect 찾기
+	var root = get_tree().root.get_child(0)
+	texture_rect = root.get_node_or_null("CameraFeed")
 
-	add_child(texture_rect)
-	print("[Camera Display] TextureRect 생성됨")
+	if texture_rect == null:
+		print("[Camera Display] ❌ CameraFeed TextureRect를 찾을 수 없음")
+		camera_state = CameraState.FAILED
+		return
+
+	print("[Camera Display] ✅ TextureRect 찾음")
 
 ## 카메라 피드 시작
 func start_camera_feed() -> bool:
