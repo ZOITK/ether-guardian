@@ -1,6 +1,10 @@
-[gd_scene load_steps=1 format=3 uid="uid://dnl4ldvh1pvcm"]
+[gd_scene load_steps=2 format=3 uid="uid://dnl4ldvh1pvcm"]
 
-[ext_resource type="Script" path="res://src/vision/ar_manager.gd" id="1_75keg"]
+[ext_resource type="Shader" path="res://src/vision/yuv_to_rgb.gdshader" id="1_shader"]
+[ext_resource type="Script" path="res://src/vision/camera_manager.gd" id="2_script"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_yuv"]
+shader = ExtResource("1_shader")
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -13,6 +17,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="CameraFeed" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_yuv")
 layout_mode = 1
 anchors_preset = 15
 anchor_left = 0.0
@@ -24,8 +29,8 @@ grow_vertical = 2
 expand_mode = 1
 stretch_mode = 0
 
-[node name="ARManager" type="Node" parent="."]
-script = ExtResource("1_75keg")
+[node name="CameraManager" type="Node" parent="."]
+script = ExtResource("2_script")
 
 [node name="StatusLabel" type="Label" parent="."]
 layout_mode = 0
