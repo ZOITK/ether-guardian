@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://dnl4ldvh1pvcm"]
+
+[ext_resource type="Script" path="res://src/vision/ar_manager.gd" id="1_75keg"]
+
+[node name="Main" type="Node3D"]
+
+[node name="ARManager" type="Node3D" parent="." node_paths=PackedStringArray()]
+script = ExtResource("1_75keg")
+
+[node name="VisionSystem" type="Node3D" parent="ARManager"]

@@ -18,6 +18,8 @@ var ar_state: ARState = ARState.UNINITIALIZED
 var platform_name: String = ""
 var ar_session = null
 var plane_cache: Dictionary = {}  # ID → PlaneData
+var permission_manager: Node = null
+var camera_display: Node3D = null
 
 func _ready() -> void:
 	platform_name = OS.get_name()
@@ -39,25 +41,77 @@ func _initialize_ar_session() -> void:
 func _initialize_arcore() -> void:
 	print("[AR Manager] ARCore 초기화 중...")
 
-	# TODO: ARCore SDK 초기화
-	# - 카메라 권한 요청
-	# - ARCore 세션 생성
-	# - 평면 감지 활성화
+	# 1단계: 권한 관리자 초기화
+	permission_manager = PermissionManager.new()
+	add_child(permission_manager)
+
+	# 카메라 권한 요청
+	if not permission_manager.request_camera_permission():
+		print("[AR Manager] ❌ 카메라 권한 거부 - ARCore 초기화 실패")
+		ar_session_failed.emit("Camera permission denied")
+		ar_state = ARState.FAILED
+		return
+
+	print("[AR Manager] ✅ 카메라 권한 획득")
+
+	# 2단계: 카메라 피드 표시
+	camera_display = CameraDisplay.new()
+	add_child(camera_display)
+
+	if not camera_display.start_camera_feed():
+		print("[AR Manager] ❌ 카메라 피드 시작 실패")
+		ar_session_failed.emit("Camera feed initialization failed")
+		ar_state = ARState.FAILED
+		return
+
+	print("[AR Manager] ✅ 카메라 피드 시작됨")
+
+	# 3단계: ARCore 세션 생성
+	# ARCore SDK를 통한 세션 생성 (C++ GDExtension에서 구현될 부분)
+	# 현재는 스켈레톤 구조로 신호 발신만 수행
+	_create_arcore_session()
 
 	ar_session_initialized.emit()
 	ar_state = ARState.RUNNING
+	print("[AR Manager] ✅ ARCore 초기화 완료")
 
 ## iOS ARKit 초기화
 func _initialize_arkit() -> void:
 	print("[AR Manager] ARKit 초기화 중...")
 
-	# TODO: ARKit 세션 생성
-	# - 카메라 권한 요청 (NSCameraUsageDescription)
-	# - ARSession 생성
-	# - planeDetection 활성화
+	# 1단계: 권한 관리자 초기화
+	permission_manager = PermissionManager.new()
+	add_child(permission_manager)
+
+	# 카메라 권한 요청 (Info.plist의 NSCameraUsageDescription 필수)
+	if not permission_manager.request_camera_permission():
+		print("[AR Manager] ❌ 카메라 권한 거부 - ARKit 초기화 실패")
+		ar_session_failed.emit("Camera permission denied")
+		ar_state = ARState.FAILED
+		return
+
+	print("[AR Manager] ✅ 카메라 권한 획득")
+
+	# 2단계: 카메라 피드 표시
+	camera_display = CameraDisplay.new()
+	add_child(camera_display)
+
+	if not camera_display.start_camera_feed():
+		print("[AR Manager] ❌ 카메라 피드 시작 실패")
+		ar_session_failed.emit("Camera feed initialization failed")
+		ar_state = ARState.FAILED
+		return
+
+	print("[AR Manager] ✅ 카메라 피드 시작됨")
+
+	# 3단계: ARKit 세션 생성
+	# ARKit을 통한 세션 생성 (C++ GDExtension에서 구현될 부분)
+	# 현재는 스켈레톤 구조로 신호 발신만 수행
+	_create_arkit_session()
 
 	ar_session_initialized.emit()
 	ar_state = ARState.RUNNING
+	print("[AR Manager] ✅ ARKit 초기화 완료")
 
 func _process(delta: float) -> void:
 	if ar_state != ARState.RUNNING:
@@ -94,3 +148,23 @@ func get_plane(plane_id: int) -> Dictionary:
 ## 모든 평면 반환
 func get_all_planes() -> Array:
 	return plane_cache.values()
+
+## ARCore 세션 생성 헬퍼 (C++ GDExtension에서 실제 구현될 부분)
+func _create_arcore_session() -> void:
+	print("[AR Manager] ARCore 세션 생성 중...")
+	# TODO: C++ GDExtension 통합
+	# - ARCore SDK 초기화
+	# - ARSession 설정
+	# - 평면 감지 콜백 등록
+	# - 실제 세션 시작
+	print("[AR Manager] ARCore 세션 생성 완료 (Phase 1 스켈레톤)")
+
+## ARKit 세션 생성 헬퍼 (C++ GDExtension에서 실제 구현될 부분)
+func _create_arkit_session() -> void:
+	print("[AR Manager] ARKit 세션 생성 중...")
+	# TODO: C++ GDExtension 통합
+	# - ARSession 설정
+	# - planeDetection 설정
+	# - 평면 감지 콜백 등록
+	# - 실제 세션 시작
+	print("[AR Manager] ARKit 세션 생성 완료 (Phase 1 스켈레톤)")

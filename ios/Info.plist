@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- 기본 앱 정보 -->
+    <key>CFBundleDevelopmentRegion</key>
+    <string>ko_KR</string>
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.zoit.etheguardian</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>Ether Guardian</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>0.1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+
+    <!-- iOS 최소 버전 -->
+    <key>MinimumOSVersion</key>
+    <string>14.3</string>
+
+    <!-- 지원하는 디바이스 방향 -->
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+    </array>
+
+    <!-- 카메라 권한 설명 (필수) -->
+    <key>NSCameraUsageDescription</key>
+    <string>AR 기능을 위해 카메라 접근이 필요합니다</string>
+
+    <!-- 위치 권한 설명 (필수) -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>게임 영토 시스템을 위해 위치 정보가 필요합니다</string>
+
+    <!-- 위치 항상 권한 (선택) -->
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>게임 영토 시스템을 위해 위치 정보가 필요합니다</string>
+
+    <!-- 인터넷 권한 -->
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_http._tcp</string>
+    </array>
+
+    <!-- ARKit 지원 -->
+    <key>UIRequiredDeviceCapabilities</key>
+    <array>
+        <string>arkit</string>
+    </array>
+
+    <!-- 백그라운드 모드 (위치 추적용) -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+    </array>
+
+    <!-- 상태 바 설정 -->
+    <key>UIStatusBarHidden</key>
+    <false/>
+    <key>UIStatusBarStyle</key>
+    <string>UIStatusBarStyleDarkContent</string>
+
+    <!-- 그 외 설정 -->
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>로컬 네트워크 통신을 위해 접근이 필요합니다</string>
+    <key>NSBonjourServiceTypes</key>
+    <array>
+        <string>_etheguardian._tcp</string>
+    </array>
+
+</dict>
+</plist>
