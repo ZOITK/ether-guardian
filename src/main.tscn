@@ -28,6 +28,8 @@ grow_horizontal = 2
 grow_vertical = 2
 expand_mode = 1
 stretch_mode = 0
+rotation = 1.5708
+pivot_offset = Vector2(540, 960)
 
 [node name="CameraManager" type="Node" parent="."]
 script = ExtResource("2_script")
@@ -36,6 +38,6 @@ script = ExtResource("2_script")
 layout_mode = 0
 offset_left = 10.0
 offset_top = 10.0
-offset_right = 400.0
-offset_bottom = 120.0
+offset_right = 500.0
+offset_bottom = 200.0
 text = "카메라 초기화 중..."
