@@ -13,18 +13,35 @@ var static_bodies: Dictionary = {}  # PlaneID → StaticBody3D
 var mesh_generation_times: Array = []
 
 func _ready() -> void:
+	print("[Mesh Generator] _ready() 시작")
 	plane_detector = get_parent()
-	ar_manager = plane_detector.ar_manager
+	print("[Mesh Generator] plane_detector: %s" % plane_detector)
 
-	if ar_manager and ar_manager.has_signal("plane_detected"):
-		ar_manager.plane_detected.connect(_on_plane_detected)
+	ar_manager = plane_detector.ar_manager
+	print("[Mesh Generator] ar_manager: %s" % ar_manager)
+
+	if ar_manager:
+		print("[Mesh Generator] ar_manager 존재, 신호 확인 중...")
+		if ar_manager.has_signal("plane_detected"):
+			ar_manager.plane_detected.connect(_on_plane_detected)
+			print("[Mesh Generator] ✅ plane_detected 신호 연결 완료")
+		else:
+			print("[Mesh Generator] ❌ plane_detected 신호 없음!")
+	else:
+		print("[Mesh Generator] ❌ ar_manager가 null입니다!")
 
 ## 평면 감지 → 메시 생성
 func _on_plane_detected(plane_data: Dictionary) -> void:
+	print("[Mesh Generator] _on_plane_detected 호출됨! ID=%d" % plane_data["id"])
 	var start_time = Time.get_ticks_msec()
 
 	# 메시 생성
 	var mesh = _create_mesh_from_vertices(plane_data["vertices"])
+	if not mesh:
+		print("[Mesh Generator] ❌ 메시 생성 실패!")
+		return
+
+	print("[Mesh Generator] 메시 생성 성공, StaticBody3D 생성 중...")
 
 	# StaticBody3D 생성 (충돌)
 	var static_body = _create_static_body(mesh, plane_data["center"])
@@ -34,6 +51,7 @@ func _on_plane_detected(plane_data: Dictionary) -> void:
 	static_bodies[plane_data["id"]] = static_body
 
 	add_child(static_body)
+	print("[Mesh Generator] ✅ 노드 추가 완료")
 
 	# 성능 측정
 	var elapsed = Time.get_ticks_msec() - start_time
@@ -45,10 +63,14 @@ func _on_plane_detected(plane_data: Dictionary) -> void:
 func _create_mesh_from_vertices(vertices: PackedVector3Array) -> Mesh:
 	# 최소 정점 수 확인
 	if vertices.size() < 3:
+		print("[Mesh Generator] ❌ 정점 부족: %d개" % vertices.size())
 		return null
+
+	print("[Mesh Generator] 메시 생성 중... 정점 수: %d" % vertices.size())
 
 	# 삼각형 분해 (복잡한 다각형 → 삼각형 목록)
 	var triangles = _triangulate_polygon(vertices)
+	print("[Mesh Generator] 삼각형 분해 완료: %d개" % (triangles.size() / 3))
 
 	# Mesh 생성
 	var mesh = Mesh.new()
@@ -67,6 +89,7 @@ func _create_mesh_from_vertices(vertices: PackedVector3Array) -> Mesh:
 		surface_tool.add_vertex(v2)
 
 	surface_tool.commit(mesh)
+	print("[Mesh Generator] Mesh.commit() 완료")
 	return mesh
 
 ## 다각형 삼각분해 (단순 부채꼴 방식)
@@ -82,18 +105,22 @@ func _triangulate_polygon(vertices: PackedVector3Array) -> PackedVector3Array:
 
 ## StaticBody3D 생성 (충돌 + 시각화)
 func _create_static_body(mesh: Mesh, position: Vector3) -> Node3D:
+	print("[Mesh Generator] StaticBody3D 생성 중... 위치: %s" % position)
 	var body = StaticBody3D.new()
 	body.position = position
 
 	# MeshInstance3D (시각화)
 	var mesh_instance = MeshInstance3D.new()
 	mesh_instance.mesh = mesh
+	mesh_instance.name = "MeshInstance3D"
+	print("[Mesh Generator] MeshInstance3D 생성 완료")
 
 	# 반투명 재료 (오버레이 효과)
 	var material = StandardMaterial3D.new()
 	material.albedo_color = Color(0.5, 0.5, 1.0, 0.3)  # 파란색, 투명도 30%
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	mesh_instance.material_override = material
+	print("[Mesh Generator] 재료 적용 완료")
 
 	body.add_child(mesh_instance)
 
@@ -102,6 +129,7 @@ func _create_static_body(mesh: Mesh, position: Vector3) -> Node3D:
 	collision_shape.shape = mesh.create_trimesh_shape()
 	body.add_child(collision_shape)
 
+	print("[Mesh Generator] StaticBody3D 생성 완료")
 	return body
 
 ## 평균 메시 생성 시간 반환
