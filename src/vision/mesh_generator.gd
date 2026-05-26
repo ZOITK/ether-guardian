@@ -36,11 +36,10 @@ func _on_plane_detected(plane_data: Dictionary) -> void:
 	print("[Mesh Generator] _on_plane_detected 호출됨! ID=%d" % plane_data["id"])
 	var start_time = Time.get_ticks_msec()
 
-	# 메시 생성
-	var mesh = _create_mesh_from_vertices(plane_data["vertices"])
-	if not mesh:
-		print("[Mesh Generator] ❌ 메시 생성 실패!")
-		return
+	# 테스트: BoxMesh 사용 (메시 생성 로직 검증)
+	var mesh = BoxMesh.new()
+	mesh.size = Vector3(1.0, 1.0, 0.1)
+	print("[Mesh Generator] BoxMesh 생성: size=%.2f x %.2f x %.2f" % [mesh.size.x, mesh.size.y, mesh.size.z])
 
 	print("[Mesh Generator] 메시 생성 성공, StaticBody3D 생성 중...")
 
@@ -52,7 +51,7 @@ func _on_plane_detected(plane_data: Dictionary) -> void:
 	static_bodies[plane_data["id"]] = static_body
 
 	add_child(static_body)
-	print("[Mesh Generator] ✅ 노드 추가 완료")
+	print("[Mesh Generator] ✅ 노드 추가 완료, 위치: %s" % static_body.position)
 
 	# 성능 측정
 	var elapsed = Time.get_ticks_msec() - start_time
