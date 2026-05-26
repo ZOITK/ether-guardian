@@ -6,8 +6,8 @@ extends Node
 signal camera_initialized
 signal camera_failed(error: String)
 
-@onready var display: TextureRect = $"../CanvasLayer/CameraFeed"
-@onready var status_label: Label = $"../CanvasLayer/StatusLabel"
+@onready var display: TextureRect = $"../CameraLayer/CameraFeed"
+@onready var status_label: Label = $"../UILayer/StatusLabel"
 
 var current_feed = null
 var camera_active: bool = false
