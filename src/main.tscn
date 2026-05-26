@@ -28,13 +28,28 @@ position = Vector3(0, 0, 0)
 mesh = SubResource("TestSphereMesh")
 material_override = SubResource("TestMaterial")
 
-[node name="DebugLabel" type="Label" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="CameraFeed" type="TextureRect" parent="CanvasLayer"]
+material = SubResource("ShaderMaterial_yuv")
+anchors_preset = 15
+anchor_left = 0.0
+anchor_top = 0.3125
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 3
+stretch_mode = 2
+
+[node name="StatusLabel" type="Label" parent="CanvasLayer"]
 offset_left = 10.0
 offset_top = 10.0
 offset_right = 1070.0
 offset_bottom = 300.0
-text = "[박스 테스트] 카메라 피드 제거됨"
-z_index = 100
+text = "카메라 초기화 중..."
+theme_overrides/font_sizes/font_size = 80
 
 [node name="CameraManager" type="Node" parent="." unique_id=297284663]
 script = ExtResource("2_script")
