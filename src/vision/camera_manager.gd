@@ -8,6 +8,7 @@ signal camera_failed(error: String)
 
 @onready var display: TextureRect = $"../CameraLayer/CameraFeed"
 @onready var status_label: Label = $"../UILayer/StatusLabel"
+@onready var ar_viewport: SubViewport = $"../ARLayer/ARViewportContainer/ARViewport"
 
 var current_feed = null
 var camera_active: bool = false

@@ -14,7 +14,9 @@ func _ready() -> void:
 	print("[Mesh Generator] _ready() 시작")
 	plane_detector = get_parent()
 	ar_manager = plane_detector.get_parent()
-	status_label = get_node_or_null("../../../UILayer/StatusLabel")
+	# Main 노드까지 올라가서 UILayer/StatusLabel 찾기
+	var root = get_tree().get_root()
+	status_label = root.get_node_or_null("Main/UILayer/StatusLabel")
 	print("[Mesh Generator] status_label: %s" % status_label)
 
 	if ar_manager and ar_manager.has_signal("plane_detected"):
