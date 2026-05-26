@@ -16,7 +16,7 @@ position = Vector3(0, 0, 0)
 current = true
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
-layer = 10
+layer = -1
 
 [node name="CameraFeed" type="TextureRect" parent="CanvasLayer"]
 material = SubResource("ShaderMaterial_yuv")
