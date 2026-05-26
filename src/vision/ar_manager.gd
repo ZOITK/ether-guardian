@@ -1,96 +1,67 @@
-extends Node
+extends Node3D
 
 ## AR 매니저: Android/iOS 카메라 통합 관리
 ## 작성일: 2026-05-21
 
-signal ar_session_initialized
-signal ar_session_failed(error: String)
+signal plane_detected(plane_data: Dictionary)
 
-@onready var display: TextureRect = $"../CameraFeed"
-@onready var status_label: Label = $"../StatusLabel"
+var camera_manager: Node
 
-var current_feed = null
-var ar_active: bool = false
+# 평면 감지 (시뮬레이션)
+var plane_counter: int = 0
+var plane_spawn_counter: int = 0
+var detected_planes: Dictionary = {}
 
 func _ready() -> void:
-	platform_name = OS.get_name()
-	print("[AR Manager] 플랫폼: %s" % platform_name)
+	print("[AR Manager] AR 시스템 초기화")
 
-	# 권한 요청
-	_request_permissions()
-
-	# 카메라 서버 모니터링 활성화
-	CameraServer.set_monitoring_feeds(true)
-	CameraServer.camera_feeds_updated.connect(_on_camera_feeds_updated)
-
-	# 초기 카메라 목록 로드
-	_on_camera_feeds_updated()
-
-## 플랫폼별 권한 요청
-func _request_permissions() -> void:
-	print("[AR Manager] 권한 요청 중...")
-
-	if platform_name == "Android":
-		OS.request_permission("CAMERA")
-		OS.request_permission("ACCESS_FINE_LOCATION")
-	elif platform_name == "iOS":
-		OS.request_permission("CAMERA")
-		OS.request_permission("ACCESS_FINE_LOCATION")
-
-	print("[AR Manager] ✅ 권한 요청 완료")
-
-## 카메라 피드 업데이트
-func _on_camera_feeds_updated() -> void:
-	var feeds = CameraServer.feeds()
-	print("[AR Manager] 카메라 피드 수: %d" % feeds.size())
-
-	if feeds.size() > 0:
-		current_feed = feeds[0]
-		print("[AR Manager] 카메라: %s" % current_feed.get_name())
-		_start_camera()
+	# 카메라 매니저 참조
+	camera_manager = get_node("../CameraManager")
+	if not camera_manager:
+		print("[AR Manager] ⚠️ 카메라 매니저 없음")
 	else:
-		print("[AR Manager] ❌ 카메라 없음")
-		if status_label:
-			status_label.text = "카메라 없음"
+		print("[AR Manager] 카메라 매니저 연결됨")
 
-## 카메라 시작
-func _start_camera() -> void:
-	if not current_feed or not display:
-		print("[AR Manager] ❌ 카메라 또는 디스플레이 없음")
-		return
+	print("[AR Manager] ✅ AR 초기화 완료")
 
-	print("[AR Manager] 카메라 활성화 중...")
-
-	# CameraTexture 생성 (Y 채널)
-	var y_tex = CameraTexture.new()
-	y_tex.camera_feed_id = current_feed.get_id()
-	y_tex.which_feed = CameraServer.FEED_Y_IMAGE
-
-	# TextureRect에 할당
-	display.texture = y_tex
-
-	# 카메라 활성화 (피드의 active 속성 설정)
-	current_feed.is_active = true
-	ar_active = true
-
-	ar_session_initialized.emit()
-
-	if status_label:
-		status_label.text = "✅ 카메라 활성화\nFPS: 0"
-
-	print("[AR Manager] ✅ 카메라 활성화됨")
-
-## 카메라 정지
-func stop_camera() -> void:
-	if current_feed:
-		current_feed.is_active = false
-	ar_active = false
-	print("[AR Manager] 카메라 정지됨")
-
-## FPS 모니터링
+## 더미 평면 생성 (3초마다)
 func _process(delta: float) -> void:
-	if ar_active and status_label:
-		var fps = Engine.get_frames_per_second()
-		status_label.text = "✅ 카메라 활성화\nFPS: %.1f" % fps
+	plane_spawn_counter += 1
+	if plane_spawn_counter >= 180:  # 3초 (60 FPS 기준)
+		_generate_dummy_plane()
+		plane_spawn_counter = 0
 
-var platform_name: String = ""
+## 더미 평면 생성 (시뮬레이션)
+func _generate_dummy_plane() -> void:
+	plane_counter += 1
+
+	# 임의의 평면 생성
+	var width = randf_range(0.5, 3.0)
+	var height = randf_range(0.5, 3.0)
+	var x = randf_range(-2.0, 2.0)
+	var y = randf_range(-1.0, 1.0)
+	var z = randf_range(0.5, 3.0)
+
+	# 평면 정점 (사각형)
+	var vertices = PackedVector3Array([
+		Vector3(x - width/2, y, z),           # 왼쪽 위
+		Vector3(x + width/2, y, z),           # 오른쪽 위
+		Vector3(x + width/2, y - height, z), # 오른쪽 아래
+		Vector3(x - width/2, y - height, z)  # 왼쪽 아래
+	])
+
+	var center = Vector3(x, y - height/2, z)
+
+	# 평면 데이터
+	var plane_data = {
+		"id": plane_counter,
+		"vertices": vertices,
+		"center": center,
+		"timestamp": Time.get_ticks_msec()
+	}
+
+	detected_planes[plane_counter] = plane_data
+	print("[AR Manager] 더미 평면 생성: ID=%d, 위치=(%.1f, %.1f, %.1f)" % [plane_counter, x, y, z])
+
+	# 평면_감지 신호 emit
+	plane_detected.emit(plane_data)

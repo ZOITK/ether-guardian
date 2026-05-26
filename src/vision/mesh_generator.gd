@@ -4,6 +4,7 @@ extends Node3D
 ## 역할: 감지된 평면을 게임 월드에 배치, 충돌 형태 설정
 ## 작성일: 2026-05-21
 
+var ar_manager: Node
 var plane_detector: Node3D
 var mesh_instances: Dictionary = {}  # PlaneID → MeshInstance3D
 var static_bodies: Dictionary = {}  # PlaneID → StaticBody3D
@@ -13,8 +14,10 @@ var mesh_generation_times: Array = []
 
 func _ready() -> void:
 	plane_detector = get_parent()
-	if plane_detector.has_signal("plane_detected"):
-		plane_detector.plane_detected.connect(_on_plane_detected)
+	ar_manager = plane_detector.ar_manager
+
+	if ar_manager and ar_manager.has_signal("plane_detected"):
+		ar_manager.plane_detected.connect(_on_plane_detected)
 
 ## 평면 감지 → 메시 생성
 func _on_plane_detected(plane_data: Dictionary) -> void:
