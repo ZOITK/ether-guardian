@@ -6,7 +6,6 @@ extends Node3D
 
 var ar_manager: Node
 var plane_detector: Node3D
-var ar_manager: Node
 var status_label: Label
 var mesh_instances: Dictionary = {}  # PlaneID → MeshInstance3D
 var static_bodies: Dictionary = {}  # PlaneID → StaticBody3D
