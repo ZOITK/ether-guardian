@@ -37,9 +37,21 @@ func _on_plane_detected(plane_data: Dictionary) -> void:
 	var start_time = Time.get_ticks_msec()
 
 	# 테스트: BoxMesh 사용 (메시 생성 로직 검증)
+	var vertices = plane_data["vertices"]
+
+	# 정점으로부터 크기 계산
+	var min_pos = vertices[0]
+	var max_pos = vertices[0]
+	for vertex in vertices:
+		min_pos = min_pos.min(vertex)
+		max_pos = max_pos.max(vertex)
+
+	var size = max_pos - min_pos
 	var mesh = BoxMesh.new()
-	mesh.size = Vector3(1.0, 1.0, 0.1)
-	print("[Mesh Generator] BoxMesh 생성: size=%.2f x %.2f x %.2f" % [mesh.size.x, mesh.size.y, mesh.size.z])
+	mesh.size = size
+	print("[Mesh Generator] BoxMesh 생성: size=%.2f x %.2f x %.2f (vertices: %d개)" % [
+		mesh.size.x, mesh.size.y, mesh.size.z, vertices.size()
+	])
 
 	print("[Mesh Generator] 메시 생성 성공, StaticBody3D 생성 중...")
 
@@ -117,10 +129,11 @@ func _create_static_body(mesh: Mesh, position: Vector3) -> Node3D:
 
 	# 반투명 재료 (오버레이 효과)
 	var material = StandardMaterial3D.new()
-	material.albedo_color = Color(0.5, 0.5, 1.0, 0.3)  # 파란색, 투명도 30%
+	material.albedo_color = Color(0.5, 0.5, 1.0, 0.8)  # 파란색, 더 진한 투명도
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED  # lighting 없이 렌더링
 	mesh_instance.material_override = material
-	print("[Mesh Generator] 재료 적용 완료")
+	print("[Mesh Generator] 재료 적용 완료 (unshaded)")
 
 	body.add_child(mesh_instance)
 
