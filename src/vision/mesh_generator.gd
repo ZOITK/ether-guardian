@@ -14,7 +14,7 @@ func _ready() -> void:
 	print("[Mesh Generator] _ready() 시작")
 	plane_detector = get_parent()
 	ar_manager = plane_detector.get_parent()
-	status_label = get_node_or_null("../../../CanvasLayer/StatusLabel")
+	status_label = get_node_or_null("../../../DebugLabel")
 	print("[Mesh Generator] status_label: %s" % status_label)
 
 	if ar_manager and ar_manager.has_signal("plane_detected"):

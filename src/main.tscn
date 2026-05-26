@@ -1,53 +1,35 @@
-[gd_scene load_steps=5 format=3 uid="uid://dnl4ldvh1pvcm"]
+[gd_scene format=3 uid="uid://dnl4ldvh1pvcm"]
 
-[ext_resource type="Shader" path="res://src/vision/yuv_to_rgb.gdshader" id="1_shader"]
-[ext_resource type="Script" path="res://src/vision/camera_manager.gd" id="2_script"]
-[ext_resource type="Script" path="res://src/vision/ar_manager.gd" id="3_ar_manager"]
-[ext_resource type="Script" path="res://src/vision/plane_detector.gd" id="4_plane_detector"]
-[ext_resource type="Script" path="res://src/vision/mesh_generator.gd" id="5_mesh_generator"]
+[ext_resource type="Shader" uid="uid://dr73krxcoh4t2" path="res://src/vision/yuv_to_rgb.gdshader" id="1_shader"]
+[ext_resource type="Script" uid="uid://cem16i0li1wwi" path="res://src/vision/camera_manager.gd" id="2_script"]
+[ext_resource type="Script" uid="uid://ci0lls28dx67f" path="res://src/vision/ar_manager.gd" id="3_ar_manager"]
+[ext_resource type="Script" uid="uid://8t3xgewqfek3" path="res://src/vision/plane_detector.gd" id="4_plane_detector"]
+[ext_resource type="Script" uid="uid://bdr1hlmvgsxwj" path="res://src/vision/mesh_generator.gd" id="5_mesh_generator"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_yuv"]
 shader = ExtResource("1_shader")
 
-[node name="Main" type="Node3D"]
+[node name="Main" type="Node3D" unique_id=787873996]
 
-[node name="Camera3D" type="Camera3D" parent="."]
-position = Vector3(0, 0, 0)
+[node name="Camera3D" type="Camera3D" parent="." unique_id=2133622418]
 current = true
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
-layer = -1
-
-[node name="CameraFeed" type="TextureRect" parent="CanvasLayer"]
-material = SubResource("ShaderMaterial_yuv")
-layout_mode = 1
-anchors_preset = 15
-anchor_left = 0.0
-anchor_top = 0.3125
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-expand_mode = 3
-stretch_mode = 2
-
-[node name="CameraManager" type="Node" parent="."]
-script = ExtResource("2_script")
-
-[node name="StatusLabel" type="Label" parent="CanvasLayer"]
-layout_mode = 0
+[node name="DebugLabel" type="Label" parent="."]
 offset_left = 10.0
 offset_top = 10.0
 offset_right = 1070.0
 offset_bottom = 300.0
-text = "카메라 초기화 중..."
-theme_overrides/font_sizes/font_size = 80
+text = "[박스 테스트] 카메라 피드 제거됨"
+z_index = 100
 
-[node name="ARManager" type="Node3D" parent="."]
+[node name="CameraManager" type="Node" parent="." unique_id=297284663]
+script = ExtResource("2_script")
+
+[node name="ARManager" type="Node3D" parent="." unique_id=1150241046]
 script = ExtResource("3_ar_manager")
 
-[node name="PlaneDetector" type="Node3D" parent="ARManager"]
+[node name="PlaneDetector" type="Node3D" parent="ARManager" unique_id=910076704]
 script = ExtResource("4_plane_detector")
 
-[node name="MeshGenerator" type="Node3D" parent="ARManager/PlaneDetector"]
+[node name="MeshGenerator" type="Node3D" parent="ARManager/PlaneDetector" unique_id=1904970329]
 script = ExtResource("5_mesh_generator")
