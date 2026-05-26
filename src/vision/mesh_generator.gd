@@ -17,7 +17,8 @@ func _ready() -> void:
 	plane_detector = get_parent()
 	print("[Mesh Generator] plane_detector: %s" % plane_detector)
 
-	ar_manager = plane_detector.ar_manager
+	# plane_detector의 부모인 ar_manager를 직접 찾기 (신호 연결 순서 문제 해결)
+	ar_manager = plane_detector.get_parent()
 	print("[Mesh Generator] ar_manager: %s" % ar_manager)
 
 	if ar_manager:
@@ -28,7 +29,7 @@ func _ready() -> void:
 		else:
 			print("[Mesh Generator] ❌ plane_detected 신호 없음!")
 	else:
-		print("[Mesh Generator] ❌ ar_manager가 null입니다!")
+		print("[Mesh Generator] ❌ ar_manager를 찾을 수 없습니다!")
 
 ## 평면 감지 → 메시 생성
 func _on_plane_detected(plane_data: Dictionary) -> void:
