@@ -6,11 +6,14 @@ extends Node3D
 
 var ar_manager: Node
 var plane_detector: Node3D
+var ar_manager: Node
+var status_label: Label
 var mesh_instances: Dictionary = {}  # PlaneID → MeshInstance3D
 var static_bodies: Dictionary = {}  # PlaneID → StaticBody3D
 
 # 성능 측정
 var mesh_generation_times: Array = []
+var mesh_count: int = 0
 
 func _ready() -> void:
 	print("[Mesh Generator] _ready() 시작")
@@ -20,6 +23,10 @@ func _ready() -> void:
 	# plane_detector의 부모인 ar_manager를 직접 찾기 (신호 연결 순서 문제 해결)
 	ar_manager = plane_detector.get_parent()
 	print("[Mesh Generator] ar_manager: %s" % ar_manager)
+
+	# StatusLabel 참조
+	status_label = get_node_or_null("../../../CanvasLayer/StatusLabel")
+	print("[Mesh Generator] status_label: %s" % status_label)
 
 	if ar_manager:
 		print("[Mesh Generator] ar_manager 존재, 신호 확인 중...")
@@ -34,6 +41,12 @@ func _ready() -> void:
 ## 평면 감지 → 메시 생성
 func _on_plane_detected(plane_data: Dictionary) -> void:
 	print("[Mesh Generator] _on_plane_detected 호출됨! ID=%d" % plane_data["id"])
+	mesh_count += 1
+
+	# UI 업데이트: 메시 생성 카운트 표시
+	if status_label:
+		status_label.text = "[메시 생성 중...]\n생성된 평면: %d개" % mesh_count
+
 	var start_time = Time.get_ticks_msec()
 
 	# 테스트: BoxMesh 사용 (메시 생성 로직 검증)
@@ -74,6 +87,12 @@ func _on_plane_detected(plane_data: Dictionary) -> void:
 	mesh_generation_times.append(elapsed)
 
 	print("[Mesh Generator] 메시 생성: ID=%d, 시간=%.2fms" % [plane_data["id"], elapsed])
+
+	# UI 업데이트: 완료 메시지
+	if status_label:
+		status_label.text = "[✅ 메시 생성 완료]\n평면 ID: %d | 개수: %d | 크기: %.1fx%.1fx%.1f" % [
+			plane_data["id"], mesh_count, mesh.size.x, mesh.size.y, mesh.size.z
+		]
 
 ## 꼭짓점 배열 → Mesh 변환
 func _create_mesh_from_vertices(vertices: PackedVector3Array) -> Mesh:
