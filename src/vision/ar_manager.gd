@@ -14,6 +14,11 @@ var detected_planes: Dictionary = {}
 
 func _ready() -> void:
 	print("[AR Manager] AR 시스템 초기화")
+	print("[AR Manager] 노드 이름: %s" % name)
+	print("[AR Manager] 부모: %s" % get_parent())
+	print("[AR Manager] 자식 수: %d" % get_child_count())
+	for child in get_children():
+		print("[AR Manager]   - 자식: %s (%s)" % [child.name, child.get_class()])
 
 	# 카메라 매니저 참조
 	camera_manager = get_node("../CameraManager")

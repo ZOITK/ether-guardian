@@ -11,9 +11,19 @@ var ar_manager: Node3D
 var detected_planes: Dictionary = {}  # ID → FilteredPlaneData
 
 func _ready() -> void:
+	print("[Plane Detector] _ready() 시작")
+	print("[Plane Detector] get_parent(): %s" % get_parent())
+	print("[Plane Detector] get_parent_node_id(): %s" % get_parent_node_id())
+	print("[Plane Detector] is in scene tree: %s" % is_node_ready())
+
 	ar_manager = get_parent()
-	if ar_manager.has_signal("plane_detected"):
+	print("[Plane Detector] ar_manager: %s" % ar_manager)
+
+	if ar_manager and ar_manager.has_signal("plane_detected"):
 		ar_manager.plane_detected.connect(_on_plane_detected)
+		print("[Plane Detector] ✅ plane_detected 신호 연결 완료")
+	else:
+		print("[Plane Detector] ❌ ar_manager 또는 신호 없음")
 
 ## 평면 감지 콜백
 func _on_plane_detected(plane_data: Dictionary) -> void:
