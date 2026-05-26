@@ -12,9 +12,8 @@ var detected_planes: Dictionary = {}  # ID → FilteredPlaneData
 
 func _ready() -> void:
 	print("[Plane Detector] _ready() 시작")
+	print("[Plane Detector] 노드 이름: %s" % name)
 	print("[Plane Detector] get_parent(): %s" % get_parent())
-	print("[Plane Detector] get_parent_node_id(): %s" % get_parent_node_id())
-	print("[Plane Detector] is in scene tree: %s" % is_node_ready())
 
 	ar_manager = get_parent()
 	print("[Plane Detector] ar_manager: %s" % ar_manager)
