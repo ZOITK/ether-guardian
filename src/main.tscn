@@ -12,10 +12,13 @@ shader = ExtResource("1_shader")
 [node name="Main" type="Node3D"]
 
 [node name="Camera3D" type="Camera3D" parent="."]
-position = Vector3(0, 0, 5)
+position = Vector3(0, 0, 0)
 current = true
 
-[node name="CameraFeed" type="TextureRect" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 10
+
+[node name="CameraFeed" type="TextureRect" parent="CanvasLayer"]
 material = SubResource("ShaderMaterial_yuv")
 layout_mode = 1
 anchors_preset = 15
@@ -31,7 +34,7 @@ stretch_mode = 2
 [node name="CameraManager" type="Node" parent="."]
 script = ExtResource("2_script")
 
-[node name="StatusLabel" type="Label" parent="."]
+[node name="StatusLabel" type="Label" parent="CanvasLayer"]
 layout_mode = 0
 offset_left = 10.0
 offset_top = 10.0
