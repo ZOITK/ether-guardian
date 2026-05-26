@@ -47,6 +47,10 @@ func _on_plane_detected(plane_data: Dictionary) -> void:
 		max_pos = max_pos.max(vertex)
 
 	var size = max_pos - min_pos
+	# z가 0인 경우 최소 두께 설정 (평면이 너무 얇아서 안 보임)
+	if size.z < 0.01:
+		size.z = 0.1
+
 	var mesh = BoxMesh.new()
 	mesh.size = size
 	print("[Mesh Generator] BoxMesh 생성: size=%.2f x %.2f x %.2f (vertices: %d개)" % [
