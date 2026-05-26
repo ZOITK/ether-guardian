@@ -29,7 +29,7 @@ mesh = SubResource("TestSphereMesh")
 material_override = SubResource("TestMaterial")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
-layer = 10
+layer = -1
 
 [node name="CameraFeed" type="TextureRect" parent="CanvasLayer"]
 material = SubResource("ShaderMaterial_yuv")
