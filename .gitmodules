@@ -1,0 +1,3 @@
+[submodule "thirdparty/godot_arcore"]
+	path = thirdparty/godot_arcore
+	url = https://github.com/GodotVR/godot_arcore.git

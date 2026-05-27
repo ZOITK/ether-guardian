@@ -16,7 +16,6 @@ production/session-logs/
 
 # === ARCore Plugin Build ===
 .godot_arcore_src/
-thirdparty/godot_arcore/
 
 # === Internal Planning (not for public) ===
 
