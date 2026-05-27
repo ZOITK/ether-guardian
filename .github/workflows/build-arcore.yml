@@ -36,7 +36,7 @@ jobs:
       - name: Android NDK 설정
         uses: nttld/setup-ndk@v1
         with:
-          ndk-version: r26b
+          ndk-version: 23.2.8568313
           link-to-sdk: true
 
       - name: SCons 설치
