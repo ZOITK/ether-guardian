@@ -5,13 +5,10 @@ on:
     branches:
       - main
       - develop
-    paths:
-      - 'thirdparty/godot_arcore/**'
-      - '.github/workflows/build-arcore.yml'
   pull_request:
-    paths:
-      - 'thirdparty/godot_arcore/**'
-      - '.github/workflows/build-arcore.yml'
+    branches:
+      - main
+      - develop
   workflow_dispatch:  # 수동 트리거 버튼
 
 jobs:
